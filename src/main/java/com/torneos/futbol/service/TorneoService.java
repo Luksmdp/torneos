@@ -1,5 +1,6 @@
 package com.torneos.futbol.service;
 
+import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.model.entity.Torneo;
 
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.List;
 public interface TorneoService {
     Torneo save(Torneo torneo);
     void delete(Torneo torneo);
-    Torneo findById(Long id);
+    Torneo findById(Integer id);
     List<Torneo> findAll();
-    void update(Torneo torneo);
+    Torneo update(Torneo torneo);
 
 
 

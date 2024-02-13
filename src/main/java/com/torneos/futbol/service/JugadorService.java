@@ -7,7 +7,7 @@ import java.util.List;
 public interface JugadorService {
     Jugador save(Jugador jugador);
     void delete(Jugador jugador);
-    Jugador findById(Long id);
+    Jugador findById(Integer id);
     List<Jugador> findAll();
-    void update(Jugador jugador);
+    Jugador update(Jugador jugador);
 }
