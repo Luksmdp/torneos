@@ -1,4 +1,6 @@
 package com.torneos.futbol.model.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,9 +20,11 @@ public class Equipo {
 
     @ManyToOne
     @JoinColumn(name = "torneo_id")
+    @JsonBackReference
     private Torneo torneo;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "equipo")
+    @JsonManagedReference
     private List<Jugador> jugadores;
 
 }

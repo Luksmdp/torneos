@@ -1,4 +1,5 @@
 package com.torneos.futbol.model.entity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Torneo {
     private java.util.Date fechaInicio;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "torneo")
+    @JsonManagedReference
     private List<Equipo> equipos;
 }
 
