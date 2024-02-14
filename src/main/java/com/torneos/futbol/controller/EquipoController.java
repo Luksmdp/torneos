@@ -2,16 +2,17 @@ package com.torneos.futbol.controller;
 
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.service.EquipoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class EquipoController {
-    @Autowired
-    private EquipoService equipoService;
+
+    private final EquipoService equipoService;
 
     @GetMapping("equipos")
     public List<Equipo> findAll() {

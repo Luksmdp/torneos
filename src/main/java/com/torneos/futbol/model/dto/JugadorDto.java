@@ -10,4 +10,5 @@ public class JugadorDto implements Serializable {
     private String nombre;
     private String posicion;
     private int edad;
+    private Integer equipoId;
 }

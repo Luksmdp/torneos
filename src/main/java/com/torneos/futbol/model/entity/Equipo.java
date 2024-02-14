@@ -23,5 +23,4 @@ public class Equipo {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "equipo")
     private List<Jugador> jugadores;
 
-
 }

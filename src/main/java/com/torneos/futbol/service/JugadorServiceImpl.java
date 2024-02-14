@@ -1,5 +1,6 @@
 package com.torneos.futbol.service;
 
+import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.repository.JugadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,12 @@ public class JugadorServiceImpl implements JugadorService {
     private JugadorRepository jugadorRepository;
 
     @Override
-    public Jugador save(Jugador jugador) {
+    public Jugador save(JugadorDto jugadorDto) {
+        Jugador jugador = new Jugador();
+        jugador.setEdad(jugadorDto.getEdad());
+        jugador.setEquipo(null);
+        jugador.setNombre(jugadorDto.getNombre());
+        jugador.setPosicion(jugadorDto.getPosicion());
         return jugadorRepository.save(jugador);
     }
 
@@ -34,14 +40,21 @@ public class JugadorServiceImpl implements JugadorService {
     }
 
     @Override
-    public Jugador update(Jugador jugador) {
-        // Verifica si el jugador ya existe en la base de datos
-        if (jugadorRepository.existsById(jugador.getId())) {
-            // Actualiza el jugador existente
-            return jugadorRepository.save(jugador);
-        } else {
-            // Manejar el caso en que el jugador no exista
-            throw new RuntimeException("El jugador con ID " + jugador.getId() + " no existe.");
+    public Jugador update(Jugador jugador, Integer id) {
+        if (jugador != null) {
+
+            // Verifica si el jugador ya existe en la base de datos
+            if (jugadorRepository.existsById(id)) {
+                jugador.setId(id);
+                // Actualiza el jugador existente
+                return jugadorRepository.save(jugador);
+            } else {
+                // Manejar el caso en que el jugador no exista
+                throw new RuntimeException("El jugador con ID " + id + " no existe.");
+            }
+        }
+        else {
+            throw new RuntimeException("El jugador esta vacio");
         }
     }
 }
