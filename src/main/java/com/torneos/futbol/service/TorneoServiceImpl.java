@@ -48,11 +48,11 @@ public class TorneoServiceImpl implements TorneoService {
                 return torneoRepository.save(torneo);
             } else {
                 // Manejar el caso en que el jugador no exista
-                throw new RuntimeException("El jugador con ID " + id + " no existe.");
+                throw new RuntimeException("El torneo con ID " + id + " no existe.");
             }
         }
         else {
-            throw new RuntimeException("El jugador con esta vacio");
+            throw new RuntimeException("El torneo con esta vacio");
         }
     }
 }

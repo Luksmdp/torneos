@@ -1,5 +1,6 @@
 package com.torneos.futbol.controller;
 
+import com.torneos.futbol.model.dto.EquipoDto;
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.service.EquipoService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,8 @@ public class EquipoController {
     }
 
     @PostMapping("equipos")
-    public Equipo save(@RequestBody Equipo equipo) {
-        return equipoService.save(equipo);
+    public Equipo save(@RequestBody EquipoDto equipoDto) {
+        return equipoService.save(equipoDto);
     }
 
     @DeleteMapping("equipos/{id}")
@@ -36,6 +37,6 @@ public class EquipoController {
 
     @PutMapping("equipos/{id}")
     public Equipo update(@PathVariable Integer id, @RequestBody Equipo equipo) {
-        return equipoService.update(equipo);
+        return equipoService.update(equipo,id);
     }
 }
