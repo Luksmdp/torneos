@@ -2,7 +2,6 @@ package com.torneos.futbol.service;
 
 
 import com.torneos.futbol.model.entity.Equipo;
-import com.torneos.futbol.model.entity.Jugador;
 
 import java.util.List;
 

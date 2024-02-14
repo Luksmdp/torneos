@@ -1,20 +1,18 @@
 package com.torneos.futbol.service;
 
 import com.torneos.futbol.model.entity.Equipo;
-import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.repository.EquipoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 
 public class EquipoServiceImpl  implements EquipoService {
 
-
-    @Autowired
-    private EquipoRepository equipoRepository;
+    private final EquipoRepository equipoRepository;
     @Override
     public Equipo save(Equipo equipo) {
         return equipoRepository.save(equipo);

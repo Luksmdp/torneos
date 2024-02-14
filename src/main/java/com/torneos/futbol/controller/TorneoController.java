@@ -1,5 +1,6 @@
 package com.torneos.futbol.controller;
 
+import com.torneos.futbol.model.dto.TorneoDto;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.service.TorneoService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class TorneoController {
     }
 
     @PostMapping("torneos")
-    public Torneo save(@RequestBody Torneo torneo) {
-        return torneoService.save(torneo);
+    public Torneo save(@RequestBody TorneoDto torneoDto) {
+        return torneoService.save(torneoDto);
     }
 
     @DeleteMapping("torneos/{id}")
@@ -37,7 +38,7 @@ public class TorneoController {
 
     @PutMapping("torneos/{id}")
     public Torneo update(@PathVariable Integer id, @RequestBody Torneo torneo) {
-        return torneoService.update(torneo);
+        return torneoService.update(torneo,id);
     }
 
 }

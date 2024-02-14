@@ -4,12 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 @Data
 @Builder
-public class JugadorDto implements Serializable {
+public class TorneoDto implements Serializable {
 
     private String nombre;
-    private String posicion;
-    private int edad;
-    private Integer equipoId;
+    private Date fechaInicio;
 }
