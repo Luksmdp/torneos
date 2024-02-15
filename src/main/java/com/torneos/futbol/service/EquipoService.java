@@ -11,5 +11,5 @@ public interface EquipoService {
     void delete(Equipo equipo);
     Equipo findById(Integer id);
     List<Equipo> findAll();
-    Equipo update(Equipo equipo,Integer id);
+    Equipo update(EquipoDto equipoDto,Integer id);
 }

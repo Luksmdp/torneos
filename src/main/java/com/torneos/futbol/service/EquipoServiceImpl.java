@@ -2,6 +2,7 @@ package com.torneos.futbol.service;
 
 import com.torneos.futbol.model.dto.EquipoDto;
 import com.torneos.futbol.model.entity.Equipo;
+import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.EquipoRepository;
 import com.torneos.futbol.repository.TorneoRepository;
@@ -48,22 +49,16 @@ public class EquipoServiceImpl  implements EquipoService {
     }
 
     @Override
-    public Equipo update(Equipo equipo,Integer id) {
+    public Equipo update(EquipoDto equipoDto,Integer id) {
 
-        if(equipo != null) {
+        Equipo equipo = new Equipo();
+        equipo.setNombre(equipoDto.getNombre());
 
-            // Verifica si el equipo ya existe en la base de datos
-            if (equipoRepository.existsById(id)) {
-                equipo.setId(id);
-                // Actualiza el equipo existente
-                return equipoRepository.save(equipo);
-            } else {
-                // Manejar el caso en que el jugador no exista
-                throw new RuntimeException("El equipo con ID " + id + " no existe.");
-            }
+        if(equipoDto.getTorneoId() !=null && torneoRepository.existsById(equipoDto.getTorneoId())){
+            Torneo torneo = torneoRepository.findById(equipoDto.getTorneoId()).orElse(null);
+            equipo.setTorneo(torneo);
         }
-        else {
-            throw new RuntimeException("El equipo esta vacio");
-        }
+        equipo.setId(id);
+        return  equipoRepository.save(equipo);
     }
 }

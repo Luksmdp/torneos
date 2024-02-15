@@ -33,7 +33,7 @@ public class TorneoController {
 
     @DeleteMapping("torneos/{id}")
     public void delete(@PathVariable Integer id) {
-        torneoService.delete(torneoService.findById(id));
+        torneoService.delete(id);
     }
 
     @PutMapping("torneos/{id}")

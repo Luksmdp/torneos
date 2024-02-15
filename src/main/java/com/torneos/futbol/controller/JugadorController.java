@@ -37,7 +37,7 @@ public class JugadorController {
     }
 
     @PutMapping("jugadores/{id}")
-    public Jugador update(@PathVariable Integer id,@RequestBody Jugador jugador) {
-        return jugadorService.update(jugador,id);
+    public Jugador update(@PathVariable Integer id,@RequestBody JugadorDto jugadorDto) {
+        return jugadorService.update(jugadorDto,id);
     }
 }

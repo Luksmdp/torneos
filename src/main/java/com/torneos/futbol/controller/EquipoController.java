@@ -36,7 +36,7 @@ public class EquipoController {
     }
 
     @PutMapping("equipos/{id}")
-    public Equipo update(@PathVariable Integer id, @RequestBody Equipo equipo) {
-        return equipoService.update(equipo,id);
+    public Equipo update(@PathVariable Integer id, @RequestBody EquipoDto equipoDto) {
+        return equipoService.update(equipoDto,id);
     }
 }

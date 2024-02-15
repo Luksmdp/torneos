@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TorneoService {
     Torneo save(TorneoDto torneoDto);
-    void delete(Torneo torneo);
+    void delete(Integer id);
     Torneo findById(Integer id);
     List<Torneo> findAll();
     Torneo update(Torneo torneo, Integer id);

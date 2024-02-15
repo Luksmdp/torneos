@@ -10,5 +10,5 @@ public interface JugadorService {
     void delete(Jugador jugador);
     Jugador findById(Integer id);
     List<Jugador> findAll();
-    Jugador update(Jugador jugador,Integer id);
+    Jugador update(JugadorDto jugadorDto,Integer id);
 }
