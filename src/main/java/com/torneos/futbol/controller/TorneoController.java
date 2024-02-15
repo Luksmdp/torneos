@@ -4,6 +4,7 @@ import com.torneos.futbol.model.dto.TorneoDto;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.service.TorneoService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,22 +23,22 @@ public class TorneoController {
     }
 
     @GetMapping("torneos/{id}")
-    public Torneo findById(@PathVariable Integer id) {
+    public Torneo findById(@PathVariable Integer id) throws BadRequestException {
         return torneoService.findById(id);
     }
 
     @PostMapping("torneos")
-    public Torneo save(@RequestBody TorneoDto torneoDto) {
+    public Torneo save(@RequestBody TorneoDto torneoDto) throws BadRequestException {
         return torneoService.save(torneoDto);
     }
 
     @DeleteMapping("torneos/{id}")
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id) throws BadRequestException {
         torneoService.delete(id);
     }
 
     @PutMapping("torneos/{id}")
-    public Torneo update(@PathVariable Integer id, @RequestBody Torneo torneo) {
+    public Torneo update(@PathVariable Integer id, @RequestBody Torneo torneo) throws BadRequestException {
         return torneoService.update(torneo,id);
     }
 
