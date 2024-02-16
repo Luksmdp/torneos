@@ -3,8 +3,10 @@ package com.torneos.futbol.controller;
 import com.torneos.futbol.model.dto.TorneoDto;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.service.TorneoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Validated
 public class TorneoController {
 
 
@@ -28,7 +31,7 @@ public class TorneoController {
     }
 
     @PostMapping("torneos")
-    public Torneo save(@RequestBody TorneoDto torneoDto) throws BadRequestException {
+    public Torneo save(@Valid @RequestBody TorneoDto torneoDto) throws BadRequestException {
         return torneoService.save(torneoDto);
     }
 

@@ -19,18 +19,11 @@ public class TorneoServiceImpl implements TorneoService {
     private final TorneoRepository torneoRepository;
     @Override
     public Torneo save(TorneoDto torneoDto) throws BadRequestException {
-        if(torneoDto.getNombre() != null && torneoDto.getFechaInicio() != null) {
             Torneo torneo = new Torneo();
             torneo.setEquipos(null);
             torneo.setNombre(torneoDto.getNombre());
             torneo.setFechaInicio(torneoDto.getFechaInicio());
             return torneoRepository.save(torneo);
-        } else if (torneoDto.getNombre() == null) {
-            throw new BadRequestException("El nombre no puede ser null");
-        }
-        else {
-            throw new BadRequestException("La FechaInicio no puede ser null");
-        }
     }
 
     @Override
