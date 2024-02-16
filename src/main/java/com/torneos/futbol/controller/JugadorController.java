@@ -3,7 +3,9 @@ package com.torneos.futbol.controller;
 import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.service.JugadorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Validated
 public class JugadorController {
 
     private final JugadorService jugadorService;
@@ -27,7 +30,7 @@ public class JugadorController {
     }
 
     @PostMapping("jugadores")
-    public Jugador save(@RequestBody JugadorDto jugadorDto) {
+    public Jugador save(@Valid @RequestBody JugadorDto jugadorDto) {
         return jugadorService.save(jugadorDto);
     }
 

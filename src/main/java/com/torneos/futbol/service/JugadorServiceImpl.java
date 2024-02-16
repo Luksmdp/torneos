@@ -52,18 +52,23 @@ public class JugadorServiceImpl implements JugadorService {
 
     @Override
     public Jugador update(JugadorDto jugadorDto, Integer id) {
+        if (jugadorRepository.existsById(id)) {
 
-        if(equipoRepository.existsById(jugadorDto.getEquipoId())){
-            Equipo equipo = equipoRepository.findById(jugadorDto.getEquipoId()).orElse(null);
-            Jugador jugador = new Jugador();
-            jugador.setEquipo(equipo);
-            jugador.setEdad(jugadorDto.getEdad());
-            jugador.setNombre(jugadorDto.getNombre());
-            jugador.setPosicion(jugadorDto.getPosicion());
-            return  jugadorRepository.save(jugador);
+            if (equipoRepository.existsById(jugadorDto.getEquipoId())) {
+                Equipo equipo = equipoRepository.findById(jugadorDto.getEquipoId()).orElse(null);
+                Jugador jugador = new Jugador();
+                jugador.setId(id);
+                jugador.setEquipo(equipo);
+                jugador.setEdad(jugadorDto.getEdad());
+                jugador.setNombre(jugadorDto.getNombre());
+                jugador.setPosicion(jugadorDto.getPosicion());
+                return jugadorRepository.save(jugador);
+            } else {
+                throw new RuntimeException("El equipo con ID " + jugadorDto.getEquipoId() + " no existe.");
+            }
         }
         else {
-            throw new RuntimeException("El equipo con ID " + jugadorDto.getEquipoId() + " no existe.");
+            throw new RuntimeException("El jugador con ID " + id + " no existe.");
         }
     }
 }
