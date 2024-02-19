@@ -5,6 +5,7 @@ import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.model.entity.Jugador;
+import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.EquipoRepository;
 import com.torneos.futbol.repository.JugadorRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +23,21 @@ public class JugadorServiceImpl implements JugadorService {
     private final EquipoRepository equipoRepository;
 
     @Override
-    public Jugador save(JugadorDto jugadorDto) {
+    public Jugador save(JugadorDto jugadorDto) throws BadRequestException {
         Jugador jugador = new Jugador();
         jugador.setEdad(jugadorDto.getEdad());
         jugador.setNombre(jugadorDto.getNombre());
         jugador.setPosicion(jugadorDto.getPosicion());
 
-        Integer equipoId = jugadorDto.getEquipoId();
 
-        if (equipoId != null && equipoRepository.existsById(equipoId)) {
-            Equipo equipo = equipoRepository.findById(equipoId).orElse(null);
-            jugador.setEquipo(equipo);
+        if (jugadorDto.getEquipoId() != null) {
+            Optional<Equipo> equipoOptional = equipoRepository.findById(jugadorDto.getEquipoId());
+            if (equipoOptional.isPresent()){
+                jugador.setEquipo(equipoOptional.get());
+            }
+            else {
+                throw new BadRequestException("El Torneo con Id: "+jugadorDto.getEquipoId()+ " no existe");
+            }
         }
 
         return jugadorRepository.save(jugador);
@@ -89,7 +94,7 @@ public class JugadorServiceImpl implements JugadorService {
                 throw new BadRequestException("No se encuentra ningun Jugador con Id: " + id);
             }
         } else {
-            throw new BadRequestException("El Jugador con Id: " + id + " no puede ser null");
+            throw new BadRequestException("El Jugador no puede ser null");
         }
     }
 }

@@ -35,7 +35,7 @@ public class EquipoController {
 
     @DeleteMapping("equipos/{id}")
     public void delete(@PathVariable Integer id) {
-        equipoService.delete(equipoService.findById(id));
+        equipoService.delete(id);
     }
 
     @PutMapping("equipos/{id}")
