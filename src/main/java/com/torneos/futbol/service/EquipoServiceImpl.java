@@ -72,13 +72,13 @@ public class EquipoServiceImpl  implements EquipoService {
             if(equipoOptional.isPresent()) {
                 Equipo equipo = equipoOptional.get();
                 equipo.setNombre(equipoDto.getNombre());
-                Optional<Torneo> torneoOptional = torneoRepository.findById(equipoDto.getTorneoId());
-                if (torneoOptional.isPresent())
-                {
-                    equipo.setTorneo(torneoOptional.get());
-                }
-                else {
-                    throw new BadRequestException("El Torneo con Id: " +equipoDto.getTorneoId() + " no existe");
+                if (equipoDto.getTorneoId() != null) {
+                    Optional<Torneo> torneoOptional = torneoRepository.findById(equipoDto.getTorneoId());
+                    if (torneoOptional.isPresent()) {
+                        equipo.setTorneo(torneoOptional.get());
+                    } else {
+                        throw new BadRequestException("El Torneo con Id: " + equipoDto.getTorneoId() + " no existe");
+                    }
                 }
                 return equipoRepository.save(equipo);
             }

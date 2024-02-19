@@ -5,7 +5,6 @@ import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.model.entity.Jugador;
-import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.EquipoRepository;
 import com.torneos.futbol.repository.JugadorRepository;
 import lombok.RequiredArgsConstructor;
