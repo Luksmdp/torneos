@@ -1,5 +1,6 @@
 package com.torneos.futbol.controller;
 
+import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.service.JugadorService;
@@ -35,12 +36,12 @@ public class JugadorController {
     }
 
     @DeleteMapping("jugadores/{id}")
-    public void delete(@PathVariable Integer id) {
-        jugadorService.delete(jugadorService.findById(id));
+    public void delete(@PathVariable Integer id) throws BadRequestException{
+        jugadorService.delete(id);
     }
 
     @PutMapping("jugadores/{id}")
-    public Jugador update(@PathVariable Integer id,@RequestBody JugadorDto jugadorDto) {
+    public Jugador update(@PathVariable Integer id,@Valid @RequestBody JugadorDto jugadorDto) {
         return jugadorService.update(jugadorDto,id);
     }
 }

@@ -1,11 +1,10 @@
 package com.torneos.futbol.service;
 
+import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.TorneoDto;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.TorneoRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class TorneoServiceImpl implements TorneoService {
 
     private final TorneoRepository torneoRepository;
     @Override
-    public Torneo save(TorneoDto torneoDto) throws BadRequestException {
+    public Torneo save(TorneoDto torneoDto){
             Torneo torneo = new Torneo();
             torneo.setEquipos(null);
             torneo.setNombre(torneoDto.getNombre());
@@ -60,11 +59,15 @@ public class TorneoServiceImpl implements TorneoService {
 
 
     @Override
-    public Torneo update(Torneo torneo,Integer id) throws BadRequestException {
-        if (torneo != null) {
+    public Torneo update(TorneoDto torneoDto,Integer id) throws BadRequestException {
+        if (torneoDto != null) {
+            Optional<Torneo> torneoOptional = torneoRepository.findById(id);
             // Verifica si el torneo ya existe en la base de datos
-            if (torneoRepository.existsById(id)) {
-                torneo.setId(id);
+            if (torneoOptional.isPresent()) {
+                Torneo torneo = torneoOptional.get();
+                // Modifica datos
+                torneo.setNombre(torneoDto.getNombre());
+                torneo.setFechaInicio(torneoDto.getFechaInicio());
                 // Actualiza el torneo existente
                 return torneoRepository.save(torneo);
             } else {

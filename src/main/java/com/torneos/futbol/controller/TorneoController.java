@@ -5,9 +5,9 @@ import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.service.TorneoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.torneos.futbol.exception.BadRequestException;
 
 import java.util.List;
 
@@ -41,8 +41,8 @@ public class TorneoController {
     }
 
     @PutMapping("torneos/{id}")
-    public Torneo update(@PathVariable Integer id, @RequestBody Torneo torneo) throws BadRequestException {
-        return torneoService.update(torneo,id);
+    public Torneo update(@PathVariable Integer id,@Valid @RequestBody TorneoDto torneoDto) throws BadRequestException {
+        return torneoService.update(torneoDto,id);
     }
 
 }

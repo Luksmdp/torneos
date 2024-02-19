@@ -2,7 +2,6 @@ package com.torneos.futbol.service;
 
 import com.torneos.futbol.model.dto.EquipoDto;
 import com.torneos.futbol.model.entity.Equipo;
-import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.EquipoRepository;
 import com.torneos.futbol.repository.TorneoRepository;

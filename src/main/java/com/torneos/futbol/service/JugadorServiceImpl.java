@@ -1,5 +1,7 @@
 package com.torneos.futbol.service;
 
+
+import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.JugadorDto;
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.model.entity.Jugador;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class JugadorServiceImpl implements JugadorService {
 
         Integer equipoId = jugadorDto.getEquipoId();
 
-        if(equipoId != null && equipoRepository.existsById(equipoId)){
+        if (equipoId != null && equipoRepository.existsById(equipoId)) {
             Equipo equipo = equipoRepository.findById(equipoId).orElse(null);
             jugador.setEquipo(equipo);
         }
@@ -36,13 +39,24 @@ public class JugadorServiceImpl implements JugadorService {
     }
 
     @Override
-    public void delete(Jugador jugador) {
-        jugadorRepository.delete(jugador);
+    public void delete(Integer id) throws BadRequestException {
+        Optional<Jugador> jugadorOptional = jugadorRepository.findById(id);
+        if (jugadorOptional.isPresent()) {
+            Jugador jugador = jugadorOptional.get();
+            jugadorRepository.delete(jugador);
+        } else {
+            throw new BadRequestException("No se encontró el Torneo con el ID: " + id);
+        }
     }
 
     @Override
-    public Jugador findById(Integer id) {
-        return jugadorRepository.findById(id).orElse(null);
+    public Jugador findById(Integer id) throws BadRequestException {
+        Optional<Jugador> jugadorOptional = jugadorRepository.findById(id);
+        if (jugadorOptional.isPresent()) {
+            return jugadorOptional.get();
+        } else {
+            throw new BadRequestException("No se encuentra ningun Jugador con Id " + id);
+        }
     }
 
     @Override
@@ -51,24 +65,31 @@ public class JugadorServiceImpl implements JugadorService {
     }
 
     @Override
-    public Jugador update(JugadorDto jugadorDto, Integer id) {
-        if (jugadorRepository.existsById(id)) {
+    public Jugador update(JugadorDto jugadorDto, Integer id) throws BadRequestException {
+        if (jugadorDto != null) {
 
-            if (equipoRepository.existsById(jugadorDto.getEquipoId())) {
-                Equipo equipo = equipoRepository.findById(jugadorDto.getEquipoId()).orElse(null);
-                Jugador jugador = new Jugador();
-                jugador.setId(id);
-                jugador.setEquipo(equipo);
+            Optional<Jugador> jugadorOptional = jugadorRepository.findById(id);
+            if (jugadorOptional.isPresent()) {
+                Jugador jugador = jugadorOptional.get();
                 jugador.setEdad(jugadorDto.getEdad());
                 jugador.setNombre(jugadorDto.getNombre());
                 jugador.setPosicion(jugadorDto.getPosicion());
+                if (jugadorDto.getEquipoId() != null) {
+                    Optional<Equipo> equipoOptional = equipoRepository.findById(jugadorDto.getEquipoId());
+                    if (equipoOptional.isPresent()) {
+                        Equipo equipo = equipoOptional.get();
+                        jugador.setEquipo(equipo);
+                    }
+                    else {
+                        throw new BadRequestException("No se encuentra ningun Equipo con el Id: " +jugadorDto.getEquipoId());
+                    }
+                }
                 return jugadorRepository.save(jugador);
             } else {
-                throw new RuntimeException("El equipo con ID " + jugadorDto.getEquipoId() + " no existe.");
+                throw new BadRequestException("No se encuentra ningun Jugador con Id: " + id);
             }
-        }
-        else {
-            throw new RuntimeException("El jugador con ID " + id + " no existe.");
+        } else {
+            throw new BadRequestException("El Jugador con Id: " + id + " no puede ser null");
         }
     }
 }
