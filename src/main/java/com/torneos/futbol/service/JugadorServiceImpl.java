@@ -35,7 +35,7 @@ public class JugadorServiceImpl implements JugadorService {
                 jugador.setEquipo(equipoOptional.get());
             }
             else {
-                throw new BadRequestException("El Torneo con Id: "+jugadorDto.getEquipoId()+ " no existe");
+                throw new BadRequestException("El Equipo con Id: "+jugadorDto.getEquipoId()+ " no existe");
             }
         }
 

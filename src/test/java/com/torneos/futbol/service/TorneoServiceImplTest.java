@@ -20,20 +20,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TorneoServiceImplTest {
+    public static final String NUEVO_NOMBRE = "Nuevo Nombre";
     @Mock
     private TorneoRepository torneoRepository;
 
     @InjectMocks
     private TorneoServiceImpl torneoService;
 
-    private List<Torneo> torneos;
-    private Torneo torneo;
-    private TorneoDto torneoDto;
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        torneoService = new TorneoServiceImpl(torneoRepository);
 
     }
 
@@ -59,8 +57,10 @@ class TorneoServiceImplTest {
     @Test
     void testSave() {
         // Arrange
-        TorneoDto torneoDto = new TorneoDto("Nombre del Torneo", new Date());
+        TorneoDto torneoDto = TorneoDto.builder().nombre("Nombre del Torneo").fechaInicio(new Date()).build();
         Torneo torneoGuardado = new Torneo();
+        torneoGuardado.setNombre("Nombre del torneo guardado");
+        torneoGuardado.setFechaInicio(new Date());
         torneoGuardado.setId(1); // Supongamos que el repositorio asigna un ID al guardar
 
         when(torneoRepository.save(any(Torneo.class))).thenReturn(torneoGuardado);
@@ -150,14 +150,18 @@ class TorneoServiceImplTest {
     void testUpdate() throws BadRequestException {
         // Arrange (preparación)
         Integer idTorneoExistente = 1;
-        TorneoDto torneoDtoActualizado = new TorneoDto("Nuevo Nombre", new Date());
+        TorneoDto torneoDtoActualizado = TorneoDto.builder().fechaInicio(new Date()).nombre(NUEVO_NOMBRE).build();
+        Torneo torneoGuardar = new Torneo();
+        torneoGuardar.setNombre(NUEVO_NOMBRE);
+        torneoGuardar.setFechaInicio(new Date());
+        torneoGuardar.setId(idTorneoExistente);
 
         Torneo torneoExistente = new Torneo();
         torneoExistente.setId(idTorneoExistente);
 
         // Configuramos el comportamiento simulado del repository
         when(torneoRepository.findById(idTorneoExistente)).thenReturn(Optional.of(torneoExistente));
-        when(torneoRepository.save(any(Torneo.class))).thenAnswer(invocation -> {
+        when(torneoRepository.save(torneoGuardar)).thenAnswer(invocation -> {
             // Devolvemos el Torneo actualizado
             return invocation.getArgument(0);
         });
@@ -174,7 +178,7 @@ class TorneoServiceImplTest {
     void testUpdateTorneoNoExistente() {
         // Arrange (preparación)
         Integer idTorneoNoExistente = 2;
-        TorneoDto torneoDtoActualizado = new TorneoDto("Nuevo Nombre", new Date());
+        TorneoDto torneoDtoActualizado = TorneoDto.builder().fechaInicio(new Date()).nombre(NUEVO_NOMBRE).build();
 
         // Configuramos el comportamiento simulado del repository para devolver Optional vacío
         when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
