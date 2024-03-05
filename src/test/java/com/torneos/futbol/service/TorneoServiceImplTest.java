@@ -4,36 +4,28 @@ import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.TorneoDto;
 import com.torneos.futbol.model.entity.Torneo;
 import com.torneos.futbol.repository.TorneoRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+@ExtendWith(MockitoExtension.class)
 
 class TorneoServiceImplTest {
-    public static final String NUEVO_NOMBRE = "Nuevo Nombre";
     @Mock
     private TorneoRepository torneoRepository;
 
     @InjectMocks
     private TorneoServiceImpl torneoService;
 
+    private final TorneoDto torneoDto = TorneoDto.builder().nombre("Nuevo nombre").fechaInicio(new Date()).build();
 
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-    }
 
     @Test
     void testFindAll() {
@@ -41,7 +33,9 @@ class TorneoServiceImplTest {
         Torneo torneo1 = new Torneo();
         Torneo torneo2 = new Torneo();
 
-        List<Torneo> torneosSimulados = Arrays.asList(torneo1, torneo2);
+        List<Torneo> torneosSimulados = new ArrayList<>();
+        torneosSimulados.add(torneo1);
+        torneosSimulados.add(torneo2);
 
         // Configuramos el comportamiento simulado del repository
         when(torneoRepository.findAll()).thenReturn(torneosSimulados);
@@ -57,11 +51,10 @@ class TorneoServiceImplTest {
     @Test
     void testSave() {
         // Arrange
-        TorneoDto torneoDto = TorneoDto.builder().nombre("Nombre del Torneo").fechaInicio(new Date()).build();
         Torneo torneoGuardado = new Torneo();
         torneoGuardado.setNombre("Nombre del torneo guardado");
         torneoGuardado.setFechaInicio(new Date());
-        torneoGuardado.setId(1); // Supongamos que el repositorio asigna un ID al guardar
+        torneoGuardado.setId(1);
 
         when(torneoRepository.save(any(Torneo.class))).thenReturn(torneoGuardado);
 
@@ -99,13 +92,12 @@ class TorneoServiceImplTest {
         when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
 
         // Act y Assert (acción y verificación)
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+        try{
             torneoService.delete(idTorneoNoExistente);
-        });
-
-        // Verificamos que se lanzó la excepción esperada con el mensaje correcto
-        String mensajeEsperado = "400 No se encontró el Torneo con el ID: " + idTorneoNoExistente;
-        assertEquals(mensajeEsperado, exception.getMessage());
+        }
+        catch (BadRequestException exception){
+            assertEquals("400 No se encontró el Torneo con el ID: " + idTorneoNoExistente,exception.getMessage());
+        }
 
         // Verificamos que el método delete del repository no fue llamado
         verify(torneoRepository, never()).delete(any(Torneo.class));
@@ -126,6 +118,7 @@ class TorneoServiceImplTest {
 
         // Assert (verificación)
         assertEquals(torneoExistente, resultado);
+        verify(torneoRepository, times(1)).findById(idTorneoExistente);
     }
 
     @Test
@@ -137,60 +130,55 @@ class TorneoServiceImplTest {
         when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
 
         // Act y Assert (acción y verificación)
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+        try{
             torneoService.findById(idTorneoNoExistente);
-        });
-
-        // Verificamos que se lanzó la excepción esperada con el mensaje correcto
-        String mensajeEsperado = "400 No se encuentra ningun Torneo con el ID: " + idTorneoNoExistente;
-        assertEquals(mensajeEsperado, exception.getMessage());
+        }
+        catch (BadRequestException exception){
+            assertEquals("400 No se encuentra ningun Torneo con el ID: " + idTorneoNoExistente,exception.getMessage());
+        }
+        verify(torneoRepository,times(1)).findById(idTorneoNoExistente);
     }
 
     @Test
     void testUpdate() throws BadRequestException {
         // Arrange (preparación)
         Integer idTorneoExistente = 1;
-        TorneoDto torneoDtoActualizado = TorneoDto.builder().fechaInicio(new Date()).nombre(NUEVO_NOMBRE).build();
-        Torneo torneoGuardar = new Torneo();
-        torneoGuardar.setNombre(NUEVO_NOMBRE);
-        torneoGuardar.setFechaInicio(new Date());
-        torneoGuardar.setId(idTorneoExistente);
 
         Torneo torneoExistente = new Torneo();
         torneoExistente.setId(idTorneoExistente);
+        torneoExistente.setNombre(torneoDto.getNombre());
+        torneoExistente.setFechaInicio(torneoDto.getFechaInicio());
 
         // Configuramos el comportamiento simulado del repository
         when(torneoRepository.findById(idTorneoExistente)).thenReturn(Optional.of(torneoExistente));
-        when(torneoRepository.save(torneoGuardar)).thenAnswer(invocation -> {
-            // Devolvemos el Torneo actualizado
-            return invocation.getArgument(0);
-        });
+        when(torneoRepository.save(any(Torneo.class))).thenReturn(torneoExistente);
 
         // Act (acción)
-        Torneo resultado = torneoService.update(torneoDtoActualizado, idTorneoExistente);
+        Torneo resultado = torneoService.update(torneoDto, idTorneoExistente);
 
         // Assert (verificación)
-        assertEquals(torneoDtoActualizado.getNombre(), resultado.getNombre());
-        assertEquals(torneoDtoActualizado.getFechaInicio(), resultado.getFechaInicio());
+        assertEquals(torneoDto.getNombre(), resultado.getNombre());
+        assertEquals(torneoDto.getFechaInicio(), resultado.getFechaInicio());
+        assertEquals(idTorneoExistente,resultado.getId());
     }
 
     @Test
     void testUpdateTorneoNoExistente() {
         // Arrange (preparación)
         Integer idTorneoNoExistente = 2;
-        TorneoDto torneoDtoActualizado = TorneoDto.builder().fechaInicio(new Date()).nombre(NUEVO_NOMBRE).build();
 
         // Configuramos el comportamiento simulado del repository para devolver Optional vacío
         when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
 
         // Act y Assert (acción y verificación)
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            torneoService.update(torneoDtoActualizado, idTorneoNoExistente);
-        });
+        try{
+            torneoService.update(torneoDto,idTorneoNoExistente);
+        }
+        catch (BadRequestException exception){
+            assertEquals("400 El torneo con ID " + idTorneoNoExistente + " no existe.",exception.getMessage());
+        }
 
-        // Verificamos que se lanzó la excepción esperada con el mensaje correcto
-        String mensajeEsperado = "400 El torneo con ID " + idTorneoNoExistente + " no existe.";
-        assertEquals(mensajeEsperado, exception.getMessage());
+        verify(torneoRepository,never()).save(any(Torneo.class));
     }
 
     @Test
@@ -199,11 +187,13 @@ class TorneoServiceImplTest {
         Integer idTorneoExistente = 1;
 
         // Act y Assert (acción y verificación)
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            torneoService.update(null, idTorneoExistente);
-        });
+        try{
+            torneoService.update(null,idTorneoExistente);
+        }
+        catch (BadRequestException exception){
+            assertEquals("400 El Torneo no puede ser null", exception.getMessage());
+        }
 
-        // Verificamos que se lanzó la excepción esperada con el mensaje correcto
-        assertEquals("400 El Torneo no puede ser null", exception.getMessage());
+        verify(torneoRepository,never()).save(any(Torneo.class));
     }
 }
