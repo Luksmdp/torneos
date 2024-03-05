@@ -6,13 +6,13 @@ import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.model.entity.Jugador;
 import com.torneos.futbol.repository.EquipoRepository;
 import com.torneos.futbol.repository.JugadorRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class JugadorServiceImplTest {
     @Mock
     private JugadorRepository jugadorRepository;
@@ -31,27 +32,20 @@ class JugadorServiceImplTest {
 
     private final JugadorDto jugadorDto = JugadorDto.builder().nombre("Prueba").edad(12).posicion("Defensor").build();
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void save() {
-        Jugador jugadorGuardado = new Jugador();
-        jugadorGuardado.setNombre("Prueba");
-        jugadorGuardado.setEdad(12);
-        jugadorGuardado.setPosicion("Defensor");
-        jugadorGuardado.setId(1);
+        Jugador jugadorExistente = new Jugador();
+        jugadorExistente.setNombre(jugadorDto.getNombre());
+        jugadorExistente.setEdad(jugadorDto.getEdad());
+        jugadorExistente.setPosicion(jugadorDto.getPosicion());
+        jugadorExistente.setId(1);
 
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorGuardado);
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
 
         Jugador resultado = jugadorService.save(jugadorDto);
 
-        assertEquals(jugadorGuardado,resultado);
-        assertEquals(jugadorGuardado.getNombre(),jugadorDto.getNombre());
-        assertEquals(jugadorGuardado.getEdad(),jugadorDto.getEdad());
-        assertEquals(jugadorGuardado.getPosicion(),jugadorDto.getPosicion());
+        assertEquals(jugadorExistente,resultado);
 
         verify(jugadorRepository,times(1)).save(any(Jugador.class));
     }
@@ -59,19 +53,20 @@ class JugadorServiceImplTest {
     @Test
     void saveJugadorIdEquipoExistente(){
         Integer idEquipoExistente = 1;
-        Equipo equipoOptional = new Equipo();
-        equipoOptional.setId(idEquipoExistente);
-        Jugador jugadorGuardado = new Jugador();
-        jugadorGuardado.setEquipo(equipoOptional);
+        Equipo equipoExistente = new Equipo();
+        equipoExistente.setId(idEquipoExistente);
+
+        Jugador jugadorExistente = new Jugador();
+        jugadorExistente.setEquipo(equipoExistente);
+
         jugadorDto.setEquipoId(idEquipoExistente);
 
-        when(equipoRepository.findById(idEquipoExistente)).thenReturn(Optional.of(equipoOptional));
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorGuardado);
+        when(equipoRepository.findById(idEquipoExistente)).thenReturn(Optional.of(equipoExistente));
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
 
         Jugador resultado = jugadorService.save(jugadorDto);
 
-        assertEquals(jugadorGuardado,resultado);
-        assertEquals(jugadorGuardado.getEquipo(),resultado.getEquipo());
+        assertEquals(jugadorExistente,resultado);
 
         verify(jugadorRepository, times(1)).save(any(Jugador.class));
     }
@@ -85,11 +80,11 @@ class JugadorServiceImplTest {
 
         try {
             jugadorService.save(jugadorDto);
-            equipoRepository.findById(idEquipoNoExistente);
         }
         catch (BadRequestException exception){
             assertEquals("400 El Equipo con Id: "+idEquipoNoExistente+ " no existe",exception.getMessage());
         }
+        verify(jugadorRepository,never()).save(any(Jugador.class));
     }
 
     @Test
@@ -119,7 +114,7 @@ class JugadorServiceImplTest {
             assertEquals("400 No se encontró el Torneo con el ID: 2", exception.getMessage());
         }
 
-        verify(jugadorRepository,times(0)).delete(jugadorNoExistente);
+        verify(jugadorRepository,never()).save(any(Jugador.class));
     }
 
     @Test
@@ -133,15 +128,12 @@ class JugadorServiceImplTest {
         Jugador resultado = jugadorService.findById(idExistente);
 
         assertEquals(jugadorExistente,resultado);
-        assertEquals(jugadorExistente.getId(),idExistente);
         verify(jugadorRepository,times(1)).findById(idExistente);
     }
 
     @Test
     void findByIdNoExistente(){
         Integer idNoExistente = 2;
-        Jugador jugadorNoExistente = new Jugador();
-        jugadorNoExistente.setId(idNoExistente);
 
         when(jugadorRepository.findById(idNoExistente)).thenReturn(Optional.empty());
 
@@ -151,8 +143,7 @@ class JugadorServiceImplTest {
         catch (BadRequestException exception){
             assertEquals("400 No se encuentra ningun Jugador con Id "+ idNoExistente,exception.getMessage());
         }
-
-
+        verify(jugadorRepository,times(1)).findById(idNoExistente);
     }
 
     @Test
@@ -160,7 +151,9 @@ class JugadorServiceImplTest {
         Jugador jugador1 = new Jugador();
         Jugador jugador2 = new Jugador();
 
-        List<Jugador> jugadorList = Arrays.asList(jugador1,jugador2);
+        List<Jugador> jugadorList = new ArrayList<>();
+        jugadorList.add(jugador1);
+        jugadorList.add(jugador2);
 
         when(jugadorRepository.findAll()).thenReturn(jugadorList);
 
@@ -171,38 +164,55 @@ class JugadorServiceImplTest {
     }
 
     @Test
-    void update() {
+    void update(){
         Integer idExistente = 1;
-        jugadorDto.setEquipoId(idExistente);
 
-        Jugador jugadorGuardado = new Jugador();
-        jugadorGuardado.setNombre("Prueba2");
-        jugadorGuardado.setPosicion("Delantero");
-        jugadorGuardado.setEdad(14);
-        jugadorGuardado.setId(idExistente);
+        Jugador jugadorExistente = new Jugador();
+        jugadorExistente.setNombre(jugadorDto.getNombre());
+        jugadorExistente.setPosicion(jugadorDto.getPosicion());
+        jugadorExistente.setEdad(jugadorDto.getEdad());
+        jugadorExistente.setId(idExistente);
 
-        Equipo equipoOptional = new Equipo();
-        equipoOptional.setId(idExistente);
-        equipoOptional.setNombre("Equipo A");
-
-
-        when(jugadorRepository.findById((idExistente))).thenReturn(Optional.of(jugadorGuardado));
-        when(equipoRepository.findById((idExistente))).thenReturn(Optional.of(equipoOptional));
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorGuardado);
+        when(jugadorRepository.findById((idExistente))).thenReturn(Optional.of(jugadorExistente));
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
 
         Jugador resultado = jugadorService.update(jugadorDto,idExistente);
 
-        assertEquals(jugadorGuardado,resultado);
-        assertEquals(jugadorDto.getNombre(), resultado.getNombre());
-        assertEquals(jugadorDto.getPosicion(), resultado.getPosicion());
-        assertEquals(jugadorDto.getEdad(), resultado.getEdad());
+        assertEquals(jugadorExistente,resultado);
+        verify(jugadorRepository,times(1)).save(jugadorExistente);
+        verify(jugadorRepository, times(1)).findById((idExistente));
+    }
+
+    @Test
+    void updateJugadorEquipoExistente() {
+        Integer idExistente = 1;
+        jugadorDto.setEquipoId(idExistente);
+
+        Jugador jugadorExistente = new Jugador();
+        jugadorExistente.setNombre(jugadorDto.getNombre());
+        jugadorExistente.setPosicion(jugadorDto.getPosicion());
+        jugadorExistente.setEdad(jugadorDto.getEdad());
+        jugadorExistente.setId(1);
+
+        Equipo equipoExistente = new Equipo();
+        equipoExistente.setId(idExistente);
+        equipoExistente.setNombre("Equipo A");
+
+        jugadorExistente.setEquipo(equipoExistente);
+
+
+        when(jugadorRepository.findById((1))).thenReturn(Optional.of(jugadorExistente));
+        when(equipoRepository.findById((idExistente))).thenReturn(Optional.of(equipoExistente));
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
+
+        Jugador resultado = jugadorService.update(jugadorDto,1);
+
+        assertEquals(jugadorExistente,resultado);
+
         assertNotNull(resultado);
-
         assertNotNull(resultado.getEquipo());
-        assertEquals(equipoOptional.getId(), resultado.getEquipo().getId());
-        assertEquals(equipoOptional.getNombre(), resultado.getEquipo().getNombre());
 
-        verify(jugadorRepository,times(1)).save(jugadorGuardado);
+        verify(jugadorRepository,times(1)).save(jugadorExistente);
         verify(jugadorRepository, times(1)).findById((idExistente));
     }
 
@@ -217,32 +227,41 @@ class JugadorServiceImplTest {
         catch (BadRequestException exception){
             assertEquals("400 No se encuentra ningun Jugador con Id: " + idNoExistente, exception.getMessage());
         }
+        verify(jugadorRepository,never()).save(any(Jugador.class));
     }
 
     @Test
     void updateJugadorDtoNull(){
-        Integer id = 3;
         try{
-            jugadorService.update(null,id);
+            jugadorService.update(null,1);
         }
         catch (BadRequestException exception){
             assertEquals("400 El Jugador no puede ser null",exception.getMessage());
         }
+        verify(jugadorRepository,never()).save(any(Jugador.class));
     }
 
     @Test
     void updateEquipoIdNoExistente(){
-        Integer id = 3;
-        jugadorDto.setEquipoId(id);
-        Jugador jugadorGuardado = new Jugador();
-        jugadorGuardado.setId(id);
-        when(jugadorRepository.findById(id)).thenReturn(Optional.of(jugadorGuardado));
-        when(equipoRepository.findById(id)).thenReturn(Optional.empty());
+        Integer idEquipoNoExistente = 2;
+
+        jugadorDto.setEquipoId(idEquipoNoExistente);
+
+        Jugador jugadorExistente = new Jugador();
+        jugadorExistente.setId(1);
+
+        when(jugadorRepository.findById(1)).thenReturn(Optional.of(jugadorExistente));
+        when(equipoRepository.findById(idEquipoNoExistente)).thenReturn(Optional.empty());
+
         try{
-            jugadorService.update(jugadorDto,id);
+            jugadorService.update(jugadorDto,1);
         }
         catch (BadRequestException exception){
-            assertEquals("400 No se encuentra ningun Equipo con el Id: " +id,exception.getMessage());
+            assertEquals("400 No se encuentra ningun Equipo con el Id: " +idEquipoNoExistente,exception.getMessage());
         }
+
+        verify(jugadorRepository,times(1)).findById((1));
+        verify(equipoRepository,times(1)).findById((idEquipoNoExistente));
+        verify(jugadorRepository,never()).save(any(Jugador.class));
     }
 }

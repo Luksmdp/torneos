@@ -37,40 +37,40 @@ class EquipoServiceImplTest {
 
     @Test
     void save(){
-        Equipo equipoGuardado = new Equipo();
-        equipoGuardado.setNombre(equipoDto.getNombre());
-        equipoGuardado.setId(1);
+        Equipo equipoExistente = new Equipo();
+        equipoExistente.setNombre(equipoDto.getNombre());
+        equipoExistente.setId(1);
 
         equipoDto.setTorneoId(null);
 
-        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoGuardado);
+        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
 
         Equipo resultado = equipoService.save(equipoDto);
 
-        assertEquals(equipoGuardado,resultado);
-        assertEquals(resultado.getNombre(),equipoDto.getNombre());
+        assertEquals(equipoExistente,resultado);
+        assertEquals(equipoExistente.getNombre(),equipoDto.getNombre());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
     }
     @Test
     void saveEquipoDtoTorneoIdExistente() {
 
         Integer idExistente = 1;
-        Equipo equipoGuardado = new Equipo();
-        equipoGuardado.setNombre(equipoDto.getNombre());
-        equipoGuardado.setId(1);
+        Equipo equipoExistente = new Equipo();
+        equipoExistente.setNombre(equipoDto.getNombre());
+        equipoExistente.setId(1);
 
         Torneo torneoExistente = new Torneo();
         torneoExistente.setId(idExistente);
-        equipoGuardado.setTorneo(torneoExistente);
+        equipoExistente.setTorneo(torneoExistente);
 
         equipoDto.setTorneoId(idExistente);
 
-        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoGuardado);
+        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
         when(torneoRepository.findById(idExistente)).thenReturn(Optional.of(torneoExistente));
 
         Equipo resultado = equipoService.save(equipoDto);
 
-        assertEquals(equipoGuardado,resultado);
+        assertEquals(equipoExistente,resultado);
         assertEquals(resultado.getNombre(),equipoDto.getNombre());
         assertEquals(resultado.getTorneo().getId(),equipoDto.getTorneoId());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
