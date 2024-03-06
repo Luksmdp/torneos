@@ -30,59 +30,84 @@ class JugadorServiceImplTest {
     @InjectMocks
     private  JugadorServiceImpl jugadorService;
 
-    private final JugadorDto jugadorDto = JugadorDto.builder().nombre("Prueba").edad(12).posicion("Defensor").build();
 
 
     @Test
     void save() {
-        Jugador jugadorExistente = new Jugador();
-        jugadorExistente.setNombre(jugadorDto.getNombre());
-        jugadorExistente.setEdad(jugadorDto.getEdad());
-        jugadorExistente.setPosicion(jugadorDto.getPosicion());
-        jugadorExistente.setId(1);
+        Integer nuevoId = 1;
 
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).build();
+
+
+        Jugador jugadorGuardado = new Jugador();
+        jugadorGuardado.setNombre(nuevoNombre);
+        jugadorGuardado.setEdad(nuevaEdad);
+        jugadorGuardado.setPosicion(nuevaPosicion);
+        jugadorGuardado.setId(nuevoId);
+
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorGuardado);
 
         Jugador resultado = jugadorService.save(jugadorDto);
 
-        assertEquals(jugadorExistente,resultado);
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(nuevaPosicion,resultado.getPosicion());
+        assertEquals(nuevaEdad,resultado.getEdad());
+        assertEquals(nuevoId,resultado.getId());
 
         verify(jugadorRepository,times(1)).save(any(Jugador.class));
     }
 
     @Test
     void saveJugadorIdEquipoExistente(){
-        Integer idEquipoExistente = 1;
+        Integer nuevoJugadorId = 1;
+
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
+        Integer nuevoEquipoId = 5;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).equipoId(nuevoEquipoId).build();
+
         Equipo equipoExistente = new Equipo();
-        equipoExistente.setId(idEquipoExistente);
+        equipoExistente.setId(nuevoEquipoId);
 
-        Jugador jugadorExistente = new Jugador();
-        jugadorExistente.setEquipo(equipoExistente);
+        Jugador jugadorGuardado = new Jugador();
+        jugadorGuardado.setEquipo(equipoExistente);
+        jugadorGuardado.setNombre(nuevoNombre);
+        jugadorGuardado.setPosicion(nuevaPosicion);
+        jugadorGuardado.setEdad(nuevaEdad);
+        jugadorGuardado.setId(nuevoJugadorId);
 
-        jugadorDto.setEquipoId(idEquipoExistente);
-
-        when(equipoRepository.findById(idEquipoExistente)).thenReturn(Optional.of(equipoExistente));
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
+        when(equipoRepository.findById(nuevoEquipoId)).thenReturn(Optional.of(equipoExistente));
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorGuardado);
 
         Jugador resultado = jugadorService.save(jugadorDto);
 
-        assertEquals(jugadorExistente,resultado);
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(nuevaPosicion,resultado.getPosicion());
+        assertEquals(nuevaEdad,resultado.getEdad());
+        assertEquals(nuevoEquipoId,resultado.getEquipo().getId());
 
         verify(jugadorRepository, times(1)).save(any(Jugador.class));
     }
 
     @Test
     void saveJugadorIdEquipoNoExistente(){
-        Integer idEquipoNoExistente = 2;
-        jugadorDto.setEquipoId(idEquipoNoExistente);
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
+        Integer equipoIdNoExistente = 2;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).equipoId(equipoIdNoExistente).build();
 
-        when(equipoRepository.findById(idEquipoNoExistente)).thenReturn(Optional.empty());
+        when(equipoRepository.findById(equipoIdNoExistente)).thenReturn(Optional.empty());
 
         try {
             jugadorService.save(jugadorDto);
         }
         catch (BadRequestException exception){
-            assertEquals("400 El Equipo con Id: "+idEquipoNoExistente+ " no existe",exception.getMessage());
+            assertEquals("400 El Equipo con Id: "+equipoIdNoExistente+ " no existe",exception.getMessage());
         }
         verify(jugadorRepository,never()).save(any(Jugador.class));
     }
@@ -164,60 +189,93 @@ class JugadorServiceImplTest {
     }
 
     @Test
-    void update(){
+    void update() {
         Integer idExistente = 1;
 
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevaPosicion";
+        int nuevaEdad = 3;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).build();
+
         Jugador jugadorExistente = new Jugador();
-        jugadorExistente.setNombre(jugadorDto.getNombre());
-        jugadorExistente.setPosicion(jugadorDto.getPosicion());
-        jugadorExistente.setEdad(jugadorDto.getEdad());
+        jugadorExistente.setNombre("nombreViejo");
+        jugadorExistente.setPosicion("posicionVieja");
+        jugadorExistente.setEdad(0);
         jugadorExistente.setId(idExistente);
 
+        Jugador jugadorActualizado = new Jugador();
+        jugadorActualizado.setNombre(nuevoNombre);
+        jugadorActualizado.setPosicion(nuevaPosicion);
+        jugadorActualizado.setEdad(nuevaEdad);
+        jugadorActualizado.setId(idExistente);
+
         when(jugadorRepository.findById((idExistente))).thenReturn(Optional.of(jugadorExistente));
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
+        when(jugadorRepository.save((jugadorActualizado))).thenReturn(jugadorActualizado);
 
-        Jugador resultado = jugadorService.update(jugadorDto,idExistente);
+        Jugador resultado = jugadorService.update(jugadorDto, idExistente);
 
-        assertEquals(jugadorExistente,resultado);
-        verify(jugadorRepository,times(1)).save(jugadorExistente);
+        assertEquals(idExistente,resultado.getId());
+        assertEquals(nuevaEdad,resultado.getEdad());
+        assertEquals(nuevaPosicion,resultado.getPosicion());
+        assertEquals(nuevoNombre,resultado.getNombre());
+
+
+
+        verify(jugadorRepository, times(1)).save(jugadorActualizado);
         verify(jugadorRepository, times(1)).findById((idExistente));
+        verifyNoInteractions(equipoRepository);
     }
 
     @Test
     void updateJugadorEquipoExistente() {
-        Integer idExistente = 1;
-        jugadorDto.setEquipoId(idExistente);
+        Integer idJugadorExistente = 2;
+
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
+        Integer equipoIdExistente = 1;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).equipoId(equipoIdExistente).build();
 
         Jugador jugadorExistente = new Jugador();
-        jugadorExistente.setNombre(jugadorDto.getNombre());
-        jugadorExistente.setPosicion(jugadorDto.getPosicion());
-        jugadorExistente.setEdad(jugadorDto.getEdad());
-        jugadorExistente.setId(1);
+        jugadorExistente.setNombre("nombreViejo");
+        jugadorExistente.setPosicion("posicionVieja");
+        jugadorExistente.setEdad(99);
+        jugadorExistente.setId(idJugadorExistente);
 
         Equipo equipoExistente = new Equipo();
-        equipoExistente.setId(idExistente);
+        equipoExistente.setId(equipoIdExistente);
         equipoExistente.setNombre("Equipo A");
 
-        jugadorExistente.setEquipo(equipoExistente);
+        Jugador jugadorActualizado = new Jugador();
+        jugadorActualizado.setNombre(nuevoNombre);
+        jugadorActualizado.setPosicion(nuevaPosicion);
+        jugadorActualizado.setEdad(nuevaEdad);
+        jugadorActualizado.setEquipo(equipoExistente);
+        jugadorActualizado.setId(idJugadorExistente);
 
+        when(jugadorRepository.findById((idJugadorExistente))).thenReturn(Optional.of(jugadorExistente));
+        when(equipoRepository.findById((equipoIdExistente))).thenReturn(Optional.of(equipoExistente));
+        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorActualizado);
 
-        when(jugadorRepository.findById((1))).thenReturn(Optional.of(jugadorExistente));
-        when(equipoRepository.findById((idExistente))).thenReturn(Optional.of(equipoExistente));
-        when(jugadorRepository.save(any(Jugador.class))).thenReturn(jugadorExistente);
+        Jugador resultado = jugadorService.update(jugadorDto,idJugadorExistente);
 
-        Jugador resultado = jugadorService.update(jugadorDto,1);
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(nuevaPosicion,resultado.getPosicion());
+        assertEquals(nuevaEdad,resultado.getEdad());
+        assertEquals(equipoIdExistente,resultado.getEquipo().getId());
 
-        assertEquals(jugadorExistente,resultado);
-
-        assertNotNull(resultado);
-        assertNotNull(resultado.getEquipo());
-
-        verify(jugadorRepository,times(1)).save(jugadorExistente);
-        verify(jugadorRepository, times(1)).findById((idExistente));
+        verify(equipoRepository,times(1)).findById(equipoIdExistente);
+        verify(jugadorRepository,times(1)).save(jugadorActualizado);
+        verify(jugadorRepository, times(1)).findById((idJugadorExistente));
     }
 
     @Test
     void updateIdJugadorNoExistente(){
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).build();
+
         Integer idNoExistente = 2;
 
         when(jugadorRepository.findById(idNoExistente)).thenReturn(Optional.empty());
@@ -232,8 +290,9 @@ class JugadorServiceImplTest {
 
     @Test
     void updateJugadorDtoNull(){
+        Integer id = 1;
         try{
-            jugadorService.update(null,1);
+            jugadorService.update(null,id);
         }
         catch (BadRequestException exception){
             assertEquals("400 El Jugador no puede ser null",exception.getMessage());
@@ -243,24 +302,27 @@ class JugadorServiceImplTest {
 
     @Test
     void updateEquipoIdNoExistente(){
+        String nuevoNombre = "nuevojugador";
+        String nuevaPosicion = "nuevoPosicion";
+        int nuevaEdad = 3;
         Integer idEquipoNoExistente = 2;
+        JugadorDto jugadorDto = JugadorDto.builder().edad(nuevaEdad).posicion(nuevaPosicion).nombre(nuevoNombre).equipoId(idEquipoNoExistente).build();
 
-        jugadorDto.setEquipoId(idEquipoNoExistente);
-
+        Integer idJugadorExistente = 1;
         Jugador jugadorExistente = new Jugador();
-        jugadorExistente.setId(1);
+        jugadorExistente.setId(idJugadorExistente);
 
-        when(jugadorRepository.findById(1)).thenReturn(Optional.of(jugadorExistente));
+        when(jugadorRepository.findById(idJugadorExistente)).thenReturn(Optional.of(jugadorExistente));
         when(equipoRepository.findById(idEquipoNoExistente)).thenReturn(Optional.empty());
 
         try{
-            jugadorService.update(jugadorDto,1);
+            jugadorService.update(jugadorDto,idJugadorExistente);
         }
         catch (BadRequestException exception){
             assertEquals("400 No se encuentra ningun Equipo con el Id: " +idEquipoNoExistente,exception.getMessage());
         }
 
-        verify(jugadorRepository,times(1)).findById((1));
+        verify(jugadorRepository,times(1)).findById((idJugadorExistente));
         verify(equipoRepository,times(1)).findById((idEquipoNoExistente));
         verify(jugadorRepository,never()).save(any(Jugador.class));
     }

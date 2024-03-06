@@ -31,64 +31,65 @@ class EquipoServiceImplTest {
     @Mock
     private TorneoRepository torneoRepository;
 
-
-    private final EquipoDto equipoDto = EquipoDto.builder().nombre("EquipoDto").build();
-
-
     @Test
     void save(){
-        Equipo equipoExistente = new Equipo();
-        equipoExistente.setNombre(equipoDto.getNombre());
-        equipoExistente.setId(1);
+        Integer idEquipoNuevo = 1;
 
-        equipoDto.setTorneoId(null);
+        String nuevoNombre = "nuevoNombre";
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(null).build();
+
+        Equipo equipoExistente = new Equipo();
+        equipoExistente.setNombre(nuevoNombre);
+        equipoExistente.setId(idEquipoNuevo);
 
         when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
 
         Equipo resultado = equipoService.save(equipoDto);
 
-        assertEquals(equipoExistente,resultado);
-        assertEquals(equipoExistente.getNombre(),equipoDto.getNombre());
+        assertEquals(nuevoNombre,resultado.getNombre());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
     }
     @Test
     void saveEquipoDtoTorneoIdExistente() {
+        String nuevoNombre = "nuevoNombre";
+        Integer nuevoTorneoId = 1;
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(nuevoTorneoId).build();
 
-        Integer idExistente = 1;
+        Integer idEquipoExistente = 5;
         Equipo equipoExistente = new Equipo();
         equipoExistente.setNombre(equipoDto.getNombre());
-        equipoExistente.setId(1);
+        equipoExistente.setId(idEquipoExistente);
 
         Torneo torneoExistente = new Torneo();
-        torneoExistente.setId(idExistente);
+        torneoExistente.setId(nuevoTorneoId);
+
         equipoExistente.setTorneo(torneoExistente);
 
-        equipoDto.setTorneoId(idExistente);
-
         when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
-        when(torneoRepository.findById(idExistente)).thenReturn(Optional.of(torneoExistente));
+        when(torneoRepository.findById(nuevoTorneoId)).thenReturn(Optional.of(torneoExistente));
 
         Equipo resultado = equipoService.save(equipoDto);
 
-        assertEquals(equipoExistente,resultado);
-        assertEquals(resultado.getNombre(),equipoDto.getNombre());
-        assertEquals(resultado.getTorneo().getId(),equipoDto.getTorneoId());
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(nuevoTorneoId,resultado.getTorneo().getId());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
+        verify(torneoRepository,times(1)).findById(nuevoTorneoId);
     }
 
     @Test
     void saveEquipoTorneoIdNoExiste(){
 
-        Integer idNoExistente = 2;
-        equipoDto.setTorneoId(idNoExistente);
+        String nuevoNombre = "nuevoNombre";
+        Integer nuevoTorneoIdNoExistente = 1;
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(nuevoTorneoIdNoExistente).build();
 
-        when(torneoRepository.findById(idNoExistente)).thenReturn(Optional.empty());
+        when(torneoRepository.findById(nuevoTorneoIdNoExistente)).thenReturn(Optional.empty());
 
         try {
             equipoService.save(equipoDto);
         }
         catch (BadRequestException exception){
-            assertEquals("400 El Torneo con Id: "+idNoExistente+" no existe",exception.getMessage());
+            assertEquals("400 El Torneo con Id: "+nuevoTorneoIdNoExistente+" no existe",exception.getMessage());
         }
         verify(equipoRepository,never()).save(any(Equipo.class));
     }
@@ -134,7 +135,7 @@ class EquipoServiceImplTest {
 
         Equipo resultado = equipoService.findById(id);
 
-        assertEquals(equipoExistente,resultado);
+        assertEquals(id,resultado.getId());
         verify(equipoRepository,times(1)).findById(id);
     }
 
@@ -171,43 +172,64 @@ class EquipoServiceImplTest {
 
     @Test
     void update(){
-        Integer idExistente = 1;
+        String nuevoNombre = "nuevoNombre";
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(null).build();
+
+        Integer idEquipoExistente = 1;
 
         Equipo equipoExistente = new Equipo();
-        equipoExistente.setId(idExistente);
-        equipoExistente.setNombre(equipoDto.getNombre());
+        equipoExistente.setId(idEquipoExistente);
+        equipoExistente.setNombre("nombreViejo");
 
-        when(equipoRepository.findById(idExistente)).thenReturn(Optional.of(equipoExistente));
-        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
+        Equipo equipoActualizado = new Equipo();
+        equipoActualizado.setNombre(nuevoNombre);
+        equipoActualizado.setId(idEquipoExistente);
 
-        Equipo resultado = equipoService.update(equipoDto,idExistente);
+        when(equipoRepository.findById(idEquipoExistente)).thenReturn(Optional.of(equipoExistente));
+        when(equipoRepository.save(equipoActualizado)).thenReturn(equipoActualizado);
 
-        assertEquals(equipoExistente,resultado);
+        Equipo resultado = equipoService.update(equipoDto,idEquipoExistente);
+
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(idEquipoExistente,resultado.getId());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
+        verify(equipoRepository,times(1)).findById(idEquipoExistente);
     }
 
     @Test
     void updateEquipoTorneoIdExistente() {
+        String nuevoNombre = "nuevoNombre";
+        Integer idTorneoIdExistente = 3;
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(idTorneoIdExistente).build();
+
         Integer idExistente = 1;
-        equipoDto.setTorneoId(idExistente);
         Equipo equipoExistente = new Equipo();
         equipoExistente.setId(idExistente);
-        equipoExistente.setNombre(equipoDto.getNombre());
+        equipoExistente.setNombre("nombreViejo");
 
 
         Torneo torneoExistente = new Torneo();
-        torneoExistente.setId(idExistente);
+        torneoExistente.setId(idTorneoIdExistente);
 
         equipoExistente.setTorneo(torneoExistente);
 
+        Equipo equipoActualizado = new Equipo();
+        equipoActualizado.setTorneo(torneoExistente);
+        equipoActualizado.setNombre(nuevoNombre);
+        equipoActualizado.setId(idExistente);
+
         when(equipoRepository.findById(idExistente)).thenReturn(Optional.of(equipoExistente));
-        when(torneoRepository.findById(idExistente)).thenReturn(Optional.of(torneoExistente));
-        when(equipoRepository.save(any(Equipo.class))).thenReturn(equipoExistente);
+        when(torneoRepository.findById(idTorneoIdExistente)).thenReturn(Optional.of(torneoExistente));
+        when(equipoRepository.save(equipoActualizado)).thenReturn(equipoActualizado);
 
         Equipo resultado = equipoService.update(equipoDto,idExistente);
 
-        assertEquals(equipoExistente,resultado);
+        assertEquals(nuevoNombre,resultado.getNombre());
+        assertEquals(idTorneoIdExistente,resultado.getTorneo().getId());
+        assertEquals(idExistente,resultado.getId());
         verify(equipoRepository,times(1)).save(any(Equipo.class));
+        verify(equipoRepository,times(1)).findById(idExistente);
+        verify(torneoRepository,times(1)).findById(idTorneoIdExistente);
 
     }
 
@@ -226,8 +248,10 @@ class EquipoServiceImplTest {
 
     @Test
     void updateEquipoNoExistente(){
+        String nuevoNombre = "nuevoNombre";
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(null).build();
+
         Integer idNoExistente = 2;
-        equipoDto.setTorneoId(idNoExistente);
 
         when(equipoRepository.findById(idNoExistente)).thenReturn(Optional.empty());
 
@@ -242,20 +266,24 @@ class EquipoServiceImplTest {
 
     @Test
     void updateTorneoNoExistente(){
-        Integer idTorneoNoExistente = 2;
-        equipoDto.setTorneoId(idTorneoNoExistente);
+        Integer idEquipoExistente = 1;
+
+        String nuevoNombre = "nuevoNombre";
+        Integer idTorneoIdNoExistente = 2;
+        EquipoDto equipoDto = EquipoDto.builder().nombre(nuevoNombre).torneoId(idTorneoIdNoExistente).build();
+
         Equipo equipoExistente = new Equipo();
-        equipoExistente.setId(1);
+        equipoExistente.setId(idEquipoExistente);
 
 
-        when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
-        when(equipoRepository.findById(1)).thenReturn(Optional.of(equipoExistente));
+        when(torneoRepository.findById(idTorneoIdNoExistente)).thenReturn(Optional.empty());
+        when(equipoRepository.findById(idEquipoExistente)).thenReturn(Optional.of(equipoExistente));
 
         try {
-            equipoService.update(equipoDto,1);
+            equipoService.update(equipoDto,idEquipoExistente);
         }
         catch (BadRequestException exception){
-            assertEquals("400 El Torneo con Id: " + idTorneoNoExistente + " no existe",exception.getMessage());
+            assertEquals("400 El Torneo con Id: " + idTorneoIdNoExistente + " no existe",exception.getMessage());
         }
         verify(equipoRepository,never()).save(any(Equipo.class));
     }

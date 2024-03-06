@@ -24,8 +24,6 @@ class TorneoServiceImplTest {
     @InjectMocks
     private TorneoServiceImpl torneoService;
 
-    private final TorneoDto torneoDto = TorneoDto.builder().nombre("Nuevo nombre").fechaInicio(new Date()).build();
-
 
     @Test
     void testFindAll() {
@@ -51,10 +49,15 @@ class TorneoServiceImplTest {
     @Test
     void testSave() {
         // Arrange
+        Integer idNuevoTorneo = 1;
+        String nuevoNombre = "nuevoNombre";
+        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
+        TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
+
         Torneo torneoGuardado = new Torneo();
-        torneoGuardado.setNombre("Nombre del torneo guardado");
-        torneoGuardado.setFechaInicio(new Date());
-        torneoGuardado.setId(1);
+        torneoGuardado.setNombre(nuevoNombre);
+        torneoGuardado.setFechaInicio(nuevaFechaInicio);
+        torneoGuardado.setId(idNuevoTorneo);
 
         when(torneoRepository.save(any(Torneo.class))).thenReturn(torneoGuardado);
 
@@ -62,7 +65,8 @@ class TorneoServiceImplTest {
         Torneo resultado = torneoService.save(torneoDto);
 
         // Assert
-        assertEquals(torneoGuardado, resultado);
+        assertEquals(nuevoNombre, resultado.getNombre());
+        assertEquals(nuevaFechaInicio, resultado.getFechaInicio());
         verify(torneoRepository, times(1)).save(any(Torneo.class));
     }
 
@@ -117,7 +121,7 @@ class TorneoServiceImplTest {
         Torneo resultado = torneoService.findById(idTorneoExistente);
 
         // Assert (verificación)
-        assertEquals(torneoExistente, resultado);
+        assertEquals(torneoExistente.getId(), resultado.getId());
         verify(torneoRepository, times(1)).findById(idTorneoExistente);
     }
 
@@ -143,29 +147,44 @@ class TorneoServiceImplTest {
     void testUpdate() throws BadRequestException {
         // Arrange (preparación)
         Integer idTorneoExistente = 1;
+        String nuevoNombre = "nuevoNombre";
+        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
+
+        TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         Torneo torneoExistente = new Torneo();
         torneoExistente.setId(idTorneoExistente);
-        torneoExistente.setNombre(torneoDto.getNombre());
-        torneoExistente.setFechaInicio(torneoDto.getFechaInicio());
+        torneoExistente.setNombre("nombreViejo");
+        torneoExistente.setFechaInicio(new Date(2000,Calendar.FEBRUARY,2));
+
+        Torneo torneoActualizado = new Torneo();
+        torneoActualizado.setNombre(nuevoNombre);
+        torneoActualizado.setFechaInicio(nuevaFechaInicio);
+        torneoActualizado.setId(idTorneoExistente);
 
         // Configuramos el comportamiento simulado del repository
         when(torneoRepository.findById(idTorneoExistente)).thenReturn(Optional.of(torneoExistente));
-        when(torneoRepository.save(any(Torneo.class))).thenReturn(torneoExistente);
+        when(torneoRepository.save(torneoActualizado)).thenReturn(torneoActualizado);
 
         // Act (acción)
         Torneo resultado = torneoService.update(torneoDto, idTorneoExistente);
 
         // Assert (verificación)
-        assertEquals(torneoDto.getNombre(), resultado.getNombre());
-        assertEquals(torneoDto.getFechaInicio(), resultado.getFechaInicio());
+        assertEquals(nuevoNombre, resultado.getNombre());
+        assertEquals(nuevaFechaInicio, resultado.getFechaInicio());
         assertEquals(idTorneoExistente,resultado.getId());
+        verify(torneoRepository,times(1)).findById(idTorneoExistente);
+        verify(torneoRepository,times(1)).save(any(Torneo.class));
     }
 
     @Test
     void testUpdateTorneoNoExistente() {
         // Arrange (preparación)
+        String nuevoNombre = "nuevoNombre";
+        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
         Integer idTorneoNoExistente = 2;
+        TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
+
 
         // Configuramos el comportamiento simulado del repository para devolver Optional vacío
         when(torneoRepository.findById(idTorneoNoExistente)).thenReturn(Optional.empty());
