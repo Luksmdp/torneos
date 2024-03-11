@@ -1,5 +1,6 @@
 package com.torneos.futbol.controller;
 
+import com.torneos.futbol.exception.BadRequestException;
 import com.torneos.futbol.model.dto.EquipoDto;
 import com.torneos.futbol.model.entity.Equipo;
 import com.torneos.futbol.service.EquipoService;
@@ -24,22 +25,22 @@ public class EquipoController {
     }
 
     @GetMapping("equipos/{id}")
-    public Equipo findById(@PathVariable Integer id) {
+    public Equipo findById(@PathVariable Integer id) throws BadRequestException {
         return equipoService.findById(id);
     }
 
     @PostMapping("equipos")
-    public Equipo save(@Valid @RequestBody EquipoDto equipoDto) {
+    public Equipo save(@Valid @RequestBody EquipoDto equipoDto) throws BadRequestException{
         return equipoService.save(equipoDto);
     }
 
     @DeleteMapping("equipos/{id}")
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id) throws BadRequestException{
         equipoService.delete(id);
     }
 
     @PutMapping("equipos/{id}")
-    public Equipo update(@PathVariable Integer id,@Valid @RequestBody EquipoDto equipoDto) {
+    public Equipo update(@PathVariable Integer id,@Valid @RequestBody EquipoDto equipoDto) throws BadRequestException{
         return equipoService.update(equipoDto,id);
     }
 }

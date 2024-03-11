@@ -66,7 +66,7 @@ class JugadorControllerTest {
         when(jugadorService.findById(id)).thenThrow(new  BadRequestException("BadRequest"));
 
         try{
-            jugadorService.findById(id);
+            jugadorController.findById(id);
         }
         catch (BadRequestException exception) {
             assertEquals("400 BadRequest",exception.getMessage());
