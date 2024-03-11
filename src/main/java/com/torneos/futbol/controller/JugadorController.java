@@ -31,7 +31,7 @@ public class JugadorController {
     }
 
     @PostMapping("jugadores")
-    public Jugador save(@Valid @RequestBody JugadorDto jugadorDto) {
+    public Jugador save(@Valid @RequestBody JugadorDto jugadorDto) throws BadRequestException {
         return jugadorService.save(jugadorDto);
     }
 
