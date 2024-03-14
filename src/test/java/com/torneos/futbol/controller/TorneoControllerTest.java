@@ -10,9 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,7 +79,7 @@ class TorneoControllerTest {
     void save() {
         Integer id = 1;
         String nuevoNombre = "Nuevo Torneo";
-        Date nuevaFechaInicio = new Date(2000, Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(2020-1-1);
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         Torneo torneo = new Torneo();
@@ -101,7 +100,7 @@ class TorneoControllerTest {
     @Test
     void saveBadRequest(){
         String nuevoNombre = "Nuevo Torneo";
-        Date nuevaFechaInicio = new Date(2000, Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(2020-1-1);
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         when(torneoService.save(torneoDto)).thenThrow(new BadRequestException("BadRequest"));
@@ -145,7 +144,7 @@ class TorneoControllerTest {
     void update() {
         Integer id = 1;
         String nuevoNombre = "Nuevo Torneo";
-        Date nuevaFechaInicio = new Date(2000, Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(2000-1-1);
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         Torneo torneo = new Torneo();
@@ -167,7 +166,7 @@ class TorneoControllerTest {
     void updateBadRequest(){
         Integer id = 2;
         String nuevoNombre = "Nuevo Torneo";
-        Date nuevaFechaInicio = new Date(2000, Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(2000-1-1);
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         when(torneoService.update(torneoDto,id)).thenThrow(new BadRequestException("BadRequest"));

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -18,8 +19,8 @@ public class Torneo {
 
     private String nombre;
 
-    @Temporal(TemporalType.DATE)
-    private java.util.Date fechaInicio;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp fechaInicio;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "torneo")
     @JsonManagedReference

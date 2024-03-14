@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 
+import java.sql.Timestamp;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,7 +52,7 @@ class TorneoServiceImplTest {
         // Arrange
         Integer idNuevoTorneo = 1;
         String nuevoNombre = "nuevoNombre";
-        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(1990-1-1);
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         Torneo torneoGuardado = new Torneo();
@@ -148,14 +149,14 @@ class TorneoServiceImplTest {
         // Arrange (preparación)
         Integer idTorneoExistente = 1;
         String nuevoNombre = "nuevoNombre";
-        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(1990-1-1);
 
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
         Torneo torneoExistente = new Torneo();
         torneoExistente.setId(idTorneoExistente);
         torneoExistente.setNombre("nombreViejo");
-        torneoExistente.setFechaInicio(new Date(2000,Calendar.FEBRUARY,2));
+        torneoExistente.setFechaInicio(new Timestamp(2000-1-2));
 
         Torneo torneoActualizado = new Torneo();
         torneoActualizado.setNombre(nuevoNombre);
@@ -181,7 +182,7 @@ class TorneoServiceImplTest {
     void testUpdateTorneoNoExistente() {
         // Arrange (preparación)
         String nuevoNombre = "nuevoNombre";
-        Date nuevaFechaInicio = new Date(1990,Calendar.JANUARY,1);
+        Timestamp nuevaFechaInicio = new Timestamp(1990-1-1);
         Integer idTorneoNoExistente = 2;
         TorneoDto torneoDto = TorneoDto.builder().nombre(nuevoNombre).fechaInicio(nuevaFechaInicio).build();
 
